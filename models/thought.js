@@ -1,6 +1,6 @@
 const { Schema, model, Types } = require('mongoose');
+// import moment module to format the timestamp 
 const moment = require('moment')
-
 
 //reaction schema
 const reactionSchema = new Schema (
@@ -36,13 +36,12 @@ const reactionSchema = new Schema (
 // thought schema
 const thoughtSchema = new Schema (
     {
-        thoughtText: {
-            type: String,
-            required: true,
-            trim: true,
-            minLength: 1,
-            maxLength: 280,
-          },
+      thoughtText: {
+        type: String,
+        required: true,
+        minlength: 1,
+        maxlength: 280,
+      },
       createdAt: {
         type: Date,
         default: Date.now,
@@ -61,7 +60,8 @@ const thoughtSchema = new Schema (
         },
         id: false,
     }
-);
+)
+
 
 // get total reaction count
 thoughtSchema.virtual('reactionCount')
@@ -69,6 +69,9 @@ thoughtSchema.virtual('reactionCount')
     return this.reactions.length;
 })
 
+// create the User model using the UserSchema
 const Thought = model('Thought', thoughtSchema);
 
+
+// export the Thought model
 module.exports = Thought;
