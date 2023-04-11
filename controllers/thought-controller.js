@@ -9,37 +9,37 @@ module.exports = {
       },
 
     // get individual thought
-     getIndvThought(req, res) {
-        Thought.findOne({ _id: req.params.thoughtId })
-          .select("-__v")
+    getIndvThought(req, res) {
+      Thought.findOne({ _id: req.params.thoughtId })
+        .select("-__v")
+        .then((thought) =>
+          !thought
+            ? res.status(404).json({ message: "No thought found associated with this ID." })
+            : res.json(thought)
+        )
+        .catch((err) => res.status(500).json(err));
+     },
+
+    //create thought and push to associated user
+      createThought(req, res) {
+        Thought.create(req.body)
+          .then(({ _id }) => {
+            return User.findOneAndUpdate(
+              { _id: req.body.userId },
+              { $push: { thoughts: _id } },
+              { new: true }
+            );
+          })
           .then((thought) =>
             !thought
-              ? res.status(404).json({ message: "No thought found associated with this ID." })
+              ? res.status(404).json({ message: "No user found associated with this ID." })
               : res.json(thought)
           )
           .catch((err) => res.status(500).json(err));
       },
 
-    //add thought and push to associated user
-    addThought(req, res) {
-        Thought.create(req.body)
-            .then(({ _id }) => {
-                return User.findOneAndUpdate(
-                    { _id: req.body.userId },
-                    { $push: { thoughts: _id } },
-                    { new: true }
-                  );
-                })
-                .then((thought) =>
-                !thought
-                  ? res.status(404).json({ message: "No user found associated with this ID." })
-                  : res.json(thought)
-              )
-              .catch((err) => res.status(500).json(err));
-          }, 
-
-    //update thought
-    updateThought(req, res) {
+      //update thought
+      updateThought(req, res) {
         Thought.findOneAndUpdate(
           { _id: req.params.thoughtId },
           { $set: req.body },
@@ -47,18 +47,18 @@ module.exports = {
         )
           .then((user) =>
             !user
-              ? res.status(404).json({ message: "No thought found with this ID." })
+              ? res.status(404).json({ message: "No thought found associated with this ID." })
               : res.json(user)
           )
           .catch((err) => res.status(500).json(err));
       },
 
-    //delete thought
-    deleteThought(req, res) {
+      //delete thought
+      deleteThought(req, res) {
         Thought.findOneAndDelete({ _id: req.params.thoughtId })
           .then((thought) =>
             !thought
-              ? res.status(404).json({ message: "No thought found with this ID." })
+              ? res.status(404).json({ message: "No thought found associated with this ID." })
               : User.findOneAndUpdate(
                   { thoughts: req.params.thoughtId },
                   { $pull: { thoughts: req.params.thoughtId } },
@@ -73,8 +73,8 @@ module.exports = {
           .catch((err) => res.status(500).json(err));
       },
 
-    //create reaction
-    createReaction(req, res) {
+      //create reaciton
+      createReaction(req, res) {
         Thought.findOneAndUpdate(
           { _id: req.params.thoughtId },
           { $addToSet: { reactions: req.body } },
@@ -82,7 +82,7 @@ module.exports = {
         )
           .then((thought) =>
             !thought
-              ? res.status(404).json({ message: "No thought found with this ID" })
+              ? res.status(404).json({ message: "No thought is associated with this ID" })
               : res.json(thought)
           )
           .catch((err) => res.status(500).json(err));
@@ -97,7 +97,7 @@ module.exports = {
         )
           .then((thought) =>
             !thought
-              ? res.status(404).json({ message: "No thought found with this ID" })
+              ? res.status(404).json({ message: "No thought is associated with this ID" })
               : res.json(thought)
           )
           .catch((err) => res.status(500).json(err));

@@ -14,8 +14,8 @@ router
   .route('/')
   .get(getAllThoughts) // get all thoughts
 
-router.
-  route('/:userId')
+router
+  .route('/:userId')
   .post(addThought); //post one thought
 
 router
